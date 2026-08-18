@@ -502,9 +502,9 @@
                                 <div class="help-check-item">
                                     <span class="help-check-icon">2</span>
                                     <div><h3>安装 Git AI</h3><p>macOS / Linux 在终端执行：</p></div>
-                                    <a class="help-link-btn" href="#help-install">查看下载、SHA256 校验与安装命令</a>
+                                    <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>curl -fsSL __GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download/install.sh | bash</code></pre></div>
                                     <p>Windows 在 PowerShell 执行：</p>
-                                    <a class="help-link-btn" href="#help-install">查看 PowerShell 安全安装命令</a>
+                                    <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>irm __GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download/install.ps1 | iex</code></pre></div>
                                     <p class="help-note">安装完成后重新打开终端或 PowerShell，并运行 <code>git-ai --version</code>。</p>
                                 </div>
                                 <div class="help-check-item">
@@ -570,28 +570,16 @@
                                 <article class="help-os-card">
                                     <div class="help-os-title"><span>⊞</span><h3>Windows</h3></div>
                                     <div class="help-os-body">
-                                        <p>打开 PowerShell，下载脚本和校验清单，核对脚本后再执行：</p>
-                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>$base = "__GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download"
-Invoke-WebRequest "$base/install.ps1" -OutFile install.ps1
-Invoke-WebRequest "$base/SHA256SUMS" -OutFile SHA256SUMS
-$expected = ((Select-String -Path SHA256SUMS -Pattern "  install.ps1$").Line -split "\s+")[0].ToLower()
-$actual = (Get-FileHash .\install.ps1 -Algorithm SHA256).Hash.ToLower()
-if ($actual -ne $expected) { throw "install.ps1 SHA256 mismatch" }
-&amp; .\install.ps1</code></pre></div>
-                                        <p>如 PowerShell 禁止运行脚本，先为当前窗口临时放行：</p>
-                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code></pre></div>
+                                        <p>打开 PowerShell，执行：</p>
+                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>irm __GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download/install.ps1 | iex</code></pre></div>
                                         <p class="help-note">安装后关闭并重新打开 PowerShell，再运行 <code>git-ai --version</code>。</p>
                                     </div>
                                 </article>
                                 <article class="help-os-card">
                                     <div class="help-os-title"><span></span><h3>macOS</h3></div>
                                     <div class="help-os-body">
-                                        <p>打开“终端”，下载脚本和校验清单，核对脚本后再执行：</p>
-                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>base="__GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download"
-curl -fSLo install.sh "$base/install.sh"
-curl -fSLo SHA256SUMS "$base/SHA256SUMS"
-grep '  install.sh$' SHA256SUMS | shasum -a 256 -c -
-bash ./install.sh</code></pre></div>
+                                        <p>打开“终端”，执行：</p>
+                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>curl -fsSL __GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download/install.sh | bash</code></pre></div>
                                         <p>关闭并重新打开终端，然后检查版本：</p>
                                         <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>git-ai --version</code></pre></div>
                                     </div>
@@ -599,12 +587,8 @@ bash ./install.sh</code></pre></div>
                                 <article class="help-os-card">
                                     <div class="help-os-title"><span>◉</span><h3>Linux</h3></div>
                                     <div class="help-os-body">
-                                        <p>打开终端，下载脚本和校验清单，核对脚本后再执行：</p>
-                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>base="__GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download"
-curl -fSLo install.sh "$base/install.sh"
-curl -fSLo SHA256SUMS "$base/SHA256SUMS"
-grep '  install.sh$' SHA256SUMS | sha256sum -c -
-bash ./install.sh</code></pre></div>
+                                        <p>打开终端，执行：</p>
+                                        <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>curl -fsSL __GITAI_PUBLIC_BASE_URL__/worker/releases/latest/download/install.sh | bash</code></pre></div>
                                         <p>重新打开终端，或刷新当前窗口的 PATH：</p>
                                         <div class="help-code-block"><button type="button" data-action="copy-help-command">复制</button><pre><code>export PATH="$HOME/.git-ai/bin:$PATH"
 git-ai --version</code></pre></div>

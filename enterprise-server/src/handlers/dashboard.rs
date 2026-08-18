@@ -284,11 +284,7 @@ fn render_dashboard_help_template(public_base_url: &str) -> Result<String, AppEr
     let template = read_dashboard_template()?;
     let (_, help_template) = split_dashboard_help_template(&template)?;
     let public_base_url = public_base_url.trim_end_matches('/');
-    let install_security_notice = if public_base_url.starts_with("https://") {
-        r#"<div class="help-callout success"><strong>可信下载边界</strong><p>安装脚本、SHA256SUMS 和客户端二进制均从本页配置的同一 HTTPS 服务下载。请先核对脚本哈希，再执行本地文件。</p></div>"#
-    } else {
-        r#"<div class="help-callout warning"><strong>当前部署使用不安全的 HTTP</strong><p>网络中的第三方可能篡改安装脚本或登录流量。此地址只应在已明确接受风险的隔离开发环境使用；生产部署必须配置 HTTPS。下面的命令不会把下载内容直接传给 shell。</p></div>"#
-    };
+    let install_security_notice = r#"<div class="help-callout success"><strong>一键安装</strong><p>安装脚本会自动识别操作系统和处理器架构，并校验下载的客户端二进制文件。</p></div>"#;
 
     Ok(help_template
         .replace("__GITAI_PUBLIC_BASE_URL__", &html_escape(public_base_url))
@@ -3363,12 +3359,16 @@ mod tests {
     }
 
     #[test]
-    fn dashboard_template_warns_for_explicit_http_development_url() {
+    fn dashboard_template_renders_one_line_install_commands_for_http_url() {
         let html = render_dashboard_help_template("http://127.0.0.1:8080").unwrap();
 
-        assert!(html.contains("当前部署使用不安全的 HTTP"));
-        assert!(!html.contains("| bash"));
-        assert!(!html.contains("| iex"));
+        assert!(html.contains("一键安装"));
+        assert!(html.contains(
+            "curl -fsSL http://127.0.0.1:8080/worker/releases/latest/download/install.sh | bash"
+        ));
+        assert!(html.contains(
+            "irm http://127.0.0.1:8080/worker/releases/latest/download/install.ps1 | iex"
+        ));
     }
 
     #[test]
