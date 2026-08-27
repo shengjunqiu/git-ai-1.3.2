@@ -331,14 +331,14 @@ mod tests {
 
     #[test]
     fn test_validate_https_url_enterprise_http_server_allowed() {
-        let result = validate_https_url("http://117.147.213.234:9080");
+        let result = validate_https_url("http://117.147.213.234:38080");
         assert!(result.is_ok());
     }
 
     #[test]
     fn test_validate_https_url_enterprise_http_server_with_trailing_slash_allowed() {
-        let client = OAuthClient::with_base_url("http://117.147.213.234:9080/").unwrap();
-        assert_eq!(client.base_url(), "http://117.147.213.234:9080");
+        let client = OAuthClient::with_base_url("http://117.147.213.234:38080/").unwrap();
+        assert_eq!(client.base_url(), "http://117.147.213.234:38080");
     }
 
     #[test]

@@ -1347,7 +1347,7 @@ mod tests {
     /// Test that the default API URL is recognized as "default"
     #[test]
     fn test_default_api_url_is_recognized() {
-        assert_eq!(DEFAULT_API_BASE_URL, "http://117.147.213.234:9080");
+        assert_eq!(DEFAULT_API_BASE_URL, "http://117.147.213.234:38080");
     }
 
     /// Test that ApiContext without auth has no token when using the default base URL.

@@ -236,7 +236,7 @@ $EnterpriseReleaseChannel = '__ENTERPRISE_RELEASE_CHANNEL_PLACEHOLDER__'
 
 # Enterprise API endpoint. Every install and upgrade enforces this value,
 # replacing any api_base_url previously saved by the user.
-$EnterpriseApiBaseUrl = 'http://117.147.213.234:9080'
+$EnterpriseApiBaseUrl = 'http://117.147.213.234:38080'
 
 # Ensure TLS 1.2 for GitHub downloads on older PowerShell versions
 try {
