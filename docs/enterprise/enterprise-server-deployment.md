@@ -67,7 +67,7 @@ docker compose version
 | `443` | 是 | HTTPS 入口。 |
 | `8080` | 内网或本机 | API 容器端口。若无反向代理，测试时可临时开放。 |
 | `5433` | 否 | Postgres 宿主机映射端口。 |
-| `6379` | 否 | Redis 宿主机映射端口。 |
+| `6379` | 不映射 | Redis 仅在 Docker Compose 网络内供 API 使用。 |
 | `9000` | 否 | MinIO S3 API。 |
 | `9001` | 否 | MinIO 管理控制台。 |
 
@@ -155,33 +155,38 @@ git-ai-cas
 
 这种方式适合把镜像在本地或 CI 构建好，再上传到服务器。
 
-### 1. 在构建机生成镜像包
+### 1. 使用 GitHub Actions 生成完整离线包
 
-在仓库根目录执行：
+在 GitHub 仓库的 Actions 页面手动运行 `Build Enterprise Docker Package`，或推送 `v*` tag。工作流会生成 `linux/amd64` 离线部署包，包含 API、PostgreSQL、Redis、MinIO 镜像以及 Compose、迁移和部署脚本。
+
+下载 `git-ai-enterprise-<version>-linux-amd64` artifact，并将其中的 `.tar.gz` 和 `.sha256` 一起上传到服务器。
+
+如果只需要在构建机手工构建 API 镜像，应从仓库根目录执行。下面的方式不包含 PostgreSQL、Redis 和 MinIO 镜像，不适合完全离线的新服务器：
 
 ```bash
-cd enterprise-server
-docker build -t git-ai-enterprise-server-api:latest .
-mkdir -p deploy/images
-docker save git-ai-enterprise-server-api:latest -o deploy/images/git-ai-enterprise-server-api.tar
-tar -czhf git-ai-enterprise-server-deploy.tar.gz -C deploy .
+docker build -f enterprise-server/Dockerfile \
+  -t git-ai-enterprise-server-api:latest .
+mkdir -p enterprise-server/deploy/images
+docker save git-ai-enterprise-server-api:latest \
+  -o enterprise-server/deploy/images/git-ai-enterprise-server-api.tar
 ```
 
 上传到服务器：
 
 ```bash
-scp git-ai-enterprise-server-deploy.tar.gz user@server:/opt/
+scp git-ai-enterprise-<version>-linux-amd64.tar.gz* user@server:/opt/
 ```
 
 ### 2. 在服务器解压
 
 ```bash
 cd /opt
-tar xzf git-ai-enterprise-server-deploy.tar.gz
-cd git-ai-enterprise-server-deploy
+sha256sum -c git-ai-enterprise-<version>-linux-amd64.tar.gz.sha256
+mkdir -p /opt/git-ai-enterprise
+tar xzf /opt/git-ai-enterprise-<version>-linux-amd64.tar.gz \
+  -C /opt/git-ai-enterprise
+cd /opt/git-ai-enterprise
 ```
-
-如果解压出来不是这个目录名，而是直接出现 `docker-compose.yml`、`scripts/`、`migrations/`，就在当前解压目录继续操作。
 
 ### 3. 配置 `.env`
 
@@ -220,7 +225,8 @@ DATABASE_MAX_CONNECTIONS =
 ### 4. 加载镜像
 
 ```bash
-docker load -i images/git-ai-enterprise-server-api.tar
+(cd images && sha256sum -c SHA256SUMS)
+docker load -i images/git-ai-enterprise-stack.tar
 ```
 
 ### 5. 启动服务
@@ -614,8 +620,8 @@ API 启动时会自动运行内嵌迁移。
 在构建机重新生成镜像包，上传到服务器后：
 
 ```bash
-docker load -i images/git-ai-enterprise-server-api.tar
-docker compose up -d api
+docker load -i images/git-ai-enterprise-stack.tar
+docker compose up -d --pull never api
 docker compose logs -f api
 ```
 

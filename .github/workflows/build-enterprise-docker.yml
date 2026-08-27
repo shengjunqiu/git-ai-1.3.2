@@ -1,0 +1,119 @@
+name: Build Enterprise Docker Package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+env:
+  API_IMAGE: git-ai-enterprise-server-api
+  POSTGRES_IMAGE: postgres:16-alpine
+  REDIS_IMAGE: redis:7-alpine
+  MINIO_IMAGE: minio/minio:latest
+
+jobs:
+  package-linux-amd64:
+    name: Package Linux AMD64 offline deployment
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Read package metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -n 1)
+          if [[ -z "$VERSION" ]]; then
+            echo "::error::Could not read the git-ai version from Cargo.toml"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "package_name=git-ai-enterprise-${VERSION}-linux-amd64" >> "$GITHUB_OUTPUT"
+
+      - name: Build enterprise API image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            --file enterprise-server/Dockerfile \
+            --tag "${API_IMAGE}:${{ steps.metadata.outputs.version }}" \
+            --tag "${API_IMAGE}:latest" \
+            .
+
+      - name: Pull offline dependency images
+        run: |
+          docker pull --platform linux/amd64 "$POSTGRES_IMAGE"
+          docker pull --platform linux/amd64 "$REDIS_IMAGE"
+          docker pull --platform linux/amd64 "$MINIO_IMAGE"
+
+      - name: Verify image architectures
+        run: |
+          set -euo pipefail
+          for image in \
+            "${API_IMAGE}:${{ steps.metadata.outputs.version }}" \
+            "$POSTGRES_IMAGE" \
+            "$REDIS_IMAGE" \
+            "$MINIO_IMAGE"
+          do
+            architecture=$(docker image inspect --format '{{.Architecture}}' "$image")
+            echo "$image: $architecture"
+            if [[ "$architecture" != "amd64" ]]; then
+              echo "::error::$image has unexpected architecture $architecture"
+              exit 1
+            fi
+          done
+
+      - name: Create offline deployment archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          PACKAGE_NAME="${{ steps.metadata.outputs.package_name }}"
+          PACKAGE_DIR="${RUNNER_TEMP}/${PACKAGE_NAME}"
+
+          mkdir -p "$PACKAGE_DIR/images"
+          cp enterprise-server/deploy/docker-compose.yml "$PACKAGE_DIR/"
+          cp enterprise-server/deploy/.env.example "$PACKAGE_DIR/"
+          cp enterprise-server/deploy/README.md "$PACKAGE_DIR/DEPLOYMENT.md"
+          cp -R enterprise-server/deploy/scripts "$PACKAGE_DIR/"
+          cp -R enterprise-server/migrations "$PACKAGE_DIR/"
+          printf '%s\n' "${{ steps.metadata.outputs.version }}" > "$PACKAGE_DIR/VERSION"
+
+          docker save --output "$PACKAGE_DIR/images/git-ai-enterprise-stack.tar" \
+            "${API_IMAGE}:${{ steps.metadata.outputs.version }}" \
+            "${API_IMAGE}:latest" \
+            "$POSTGRES_IMAGE" \
+            "$REDIS_IMAGE" \
+            "$MINIO_IMAGE"
+
+          docker image inspect \
+            --format '{{join .RepoTags ","}} {{.Id}} {{.Architecture}}' \
+            "${API_IMAGE}:${{ steps.metadata.outputs.version }}" \
+            "$POSTGRES_IMAGE" \
+            "$REDIS_IMAGE" \
+            "$MINIO_IMAGE" \
+            > "$PACKAGE_DIR/IMAGE-METADATA.txt"
+
+          (
+            cd "$PACKAGE_DIR"
+            sha256sum images/git-ai-enterprise-stack.tar > images/SHA256SUMS
+          )
+
+          tar -C "$PACKAGE_DIR" -czf "${GITHUB_WORKSPACE}/${PACKAGE_NAME}.tar.gz" .
+          sha256sum "${PACKAGE_NAME}.tar.gz" > "${PACKAGE_NAME}.tar.gz.sha256"
+
+      - name: Upload offline deployment package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ steps.metadata.outputs.package_name }}
+          path: |
+            ${{ steps.metadata.outputs.package_name }}.tar.gz
+            ${{ steps.metadata.outputs.package_name }}.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

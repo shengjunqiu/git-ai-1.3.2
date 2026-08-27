@@ -2,9 +2,9 @@
 # =================================================
 # Usage:
 #   1. Copy .env.example to .env and fill in the values
-#   2. Load images: docker load -i images/git-ai-enterprise-server-api.tar
+#   2. Load images: docker load -i images/git-ai-enterprise-stack.tar
 #   3. Start services: docker compose up -d
-#   4. Run migrations: ./scripts/migrate.sh
+#   4. The API runs embedded database migrations during startup
 #
 
 services:
@@ -94,8 +94,6 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s

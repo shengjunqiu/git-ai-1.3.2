@@ -7,14 +7,16 @@
 - **Docker Compose**: v2.0+
 - **内存**: 最低 2GB，推荐 4GB+
 - **磁盘**: 最低 10GB
-- **端口**: 8080 (API), 5433 (PostgreSQL), 6379 (Redis), 9000/9001 (MinIO)
+- **端口**: 8080 (API), 5433 (PostgreSQL), 9000/9001 (MinIO)；Redis 仅在 Docker 网络内访问
 
 ## 快速部署
 
 ### 1. 解压部署包
 
 ```bash
-tar xzf git-ai-enterprise-server-deploy.tar.gz
+mkdir -p git-ai-enterprise-server-deploy
+tar xzf git-ai-enterprise-<version>-linux-amd64.tar.gz \
+  -C git-ai-enterprise-server-deploy
 cd git-ai-enterprise-server-deploy
 ```
 
@@ -31,8 +33,11 @@ vi .env
 ### 3. 加载镜像
 
 ```bash
-docker load -i images/git-ai-enterprise-server-api.tar
+(cd images && sha256sum -c SHA256SUMS)
+docker load -i images/git-ai-enterprise-stack.tar
 ```
+
+使用 `scripts/deploy.sh` 一键部署时会自动执行该校验。
 
 ### 4. 一键部署
 
@@ -43,18 +48,14 @@ bash scripts/deploy.sh
 或者手动执行：
 
 ```bash
-# 启动服务
-docker compose up -d
+# 启动离线部署包中的服务，不尝试从公网拉取镜像
+docker compose up -d --pull never
 
 # 等待服务就绪 (约 15 秒)
 sleep 15
-
-# 初始化数据库 (仅首次)
-bash scripts/migrate.sh --init
-
-# 后续升级
-bash scripts/migrate.sh --upgrade
 ```
+
+API 启动时会自动执行镜像内嵌的数据库迁移。
 
 ### 5. 验证服务
 
@@ -71,7 +72,7 @@ curl http://localhost:8080/health
 |------|------|------|
 | API | 8080 | REST API 服务 |
 | PostgreSQL | 5433 | 数据库 (外部访问) |
-| Redis | 6379 | 缓存 |
+| Redis | 不暴露 | 仅供 Compose 网络内的 API 使用 |
 | MinIO API | 9000 | S3 兼容存储 |
 | MinIO Console | 9001 | 存储管理界面 |
 
@@ -141,13 +142,10 @@ docker compose logs -f --no-log-prefix api | jq -RrC 'fromjson? // .'
 
 ```bash
 # 1. 加载新镜像
-docker load -i images/git-ai-enterprise-server-api.tar
+docker load -i images/git-ai-enterprise-stack.tar
 
 # 2. 重启 API 容器
-docker compose up -d api
-
-# 3. 执行数据库迁移
-bash scripts/migrate.sh --upgrade
+docker compose up -d --pull never api
 ```
 
 ## 数据库迁移脚本
@@ -162,8 +160,7 @@ bash scripts/migrate.sh --upgrade
 | 004 | 数据隔离 |
 | 005 | Linewell 组织及测试数据 |
 
-PostgreSQL 容器首次启动时会自动执行 `migrations/` 目录中的脚本（通过 `docker-entrypoint-initdb.d`）。
-后续迁移需手动执行 `migrate.sh`。
+PostgreSQL 容器首次启动时会读取 `migrations/` 目录；API 启动时也会按迁移记录自动执行镜像内嵌迁移。`migrate.sh` 仅用于诊断或显式手工迁移，不是正常部署步骤。
 
 ## API Key 管理
 
