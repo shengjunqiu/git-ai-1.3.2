@@ -91,13 +91,15 @@ jobs:
             "$REDIS_IMAGE" \
             "$MINIO_IMAGE"
 
-          docker image inspect \
-            --format '{{join .RepoTags ","}} {{.Id}} {{.Architecture}}' \
+          for image in \
             "${API_IMAGE}:${{ steps.metadata.outputs.version }}" \
             "$POSTGRES_IMAGE" \
             "$REDIS_IMAGE" \
-            "$MINIO_IMAGE" \
-            > "$PACKAGE_DIR/IMAGE-METADATA.txt"
+            "$MINIO_IMAGE"
+          do
+            printf '%s ' "$image"
+            docker image inspect --format '{{.Id}} {{.Architecture}}' "$image"
+          done > "$PACKAGE_DIR/IMAGE-METADATA.txt"
 
           (
             cd "$PACKAGE_DIR"
