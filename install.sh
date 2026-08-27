@@ -71,7 +71,7 @@ ENTERPRISE_RELEASE_CHANNEL="__ENTERPRISE_RELEASE_CHANNEL_PLACEHOLDER__"
 
 # Enterprise API endpoint. Every install and upgrade enforces this value,
 # replacing any api_base_url previously saved by the user.
-ENTERPRISE_API_BASE_URL="http://117.147.213.234:38080"
+ENTERPRISE_API_BASE_URL="http://117.147.213.234:9080"
 
 # Function to print error messages
 error() {

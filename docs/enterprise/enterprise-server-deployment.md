@@ -239,18 +239,18 @@ docker compose ps
 curl http://127.0.0.1:${API_PORT:-8080}/health
 ```
 
-如果 HTTPS 反向代理对外监听 `38080`、转发到 API 的 `8080`，`.env` 应设置：
+如果 HTTPS 反向代理对外监听 `9080`、转发到 API 的 `8080`，`.env` 应设置：
 
 ```env
-BASE_URL=https://git-ai.example.com:38080
+BASE_URL=https://git-ai.example.com:9080
 API_PORT=8080
 ```
 
-`API_PORT=8080` 表示服务在服务器本机监听 `8080`；运维层把外部 `38080` 转发到服务器 `8080`。如果没有运维层转发，而是希望 Docker 直接监听宿主机 `38080`，则改成：
+`API_PORT=8080` 表示服务在服务器本机监听 `8080`；运维层把外部 `9080` 转发到服务器 `8080`。如果没有运维层转发，而是希望 Docker 直接监听宿主机 `9080`，则改成：
 
 ```env
-BASE_URL=https://git-ai.example.com:38080
-API_PORT=38080
+BASE_URL=https://git-ai.example.com:9080
+API_PORT=9080
 ```
 
 ## 四、首次初始化用户和组织
@@ -328,21 +328,21 @@ docker compose exec -T postgres psql -U gitai -d gitai_enterprise \
 凭据和安装内容，不能作为生产配置：
 
 ```env
-BASE_URL=http://<server-ip>:38080
+BASE_URL=http://<server-ip>:9080
 ALLOW_INSECURE_PUBLIC_URL=true
 ```
 
 客户端也使用同一个外部地址：
 
 ```bash
-git-ai login --server http://<server-ip>:38080
+git-ai login --server http://<server-ip>:9080
 ```
 
 登录成功后客户端会自动保存服务地址，不需要额外执行 `git-ai config set`。
 
 没有域名也可以做 HTTPS，但有两个限制：
 
-1. **公网可信 IP 证书**：需要证书机构支持 IP address certificate，并且通常要通过标准 ACME challenge 验证。实际部署一般要求公网 `80` 或 `443` 能到达你的反向代理；只有 `38080 -> 8080` 映射时通常不够方便。
+1. **公网可信 IP 证书**：需要证书机构支持 IP address certificate，并且通常要通过标准 ACME challenge 验证。实际部署一般要求公网 `80` 或 `443` 能到达你的反向代理；只有 `9080 -> 8080` 映射时通常不够方便。
 2. **自签证书**：可以给 IP 签自签证书，但浏览器和 `git-ai` 客户端默认不会信任它。每台客户端都要安装你的自签 CA 到系统信任库，否则登录和上传容易失败。
 
 因此生产建议仍然是让运维分配一个域名或子域名，例如：

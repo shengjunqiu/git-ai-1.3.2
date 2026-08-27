@@ -23,7 +23,7 @@ pub use paths::{
 use std::sync::RwLock;
 
 /// Default API base URL for comparison
-pub const DEFAULT_API_BASE_URL: &str = "http://117.147.213.234:38080";
+pub const DEFAULT_API_BASE_URL: &str = "http://117.147.213.234:9080";
 
 /// Normalize an API base URL before storing or using it to build endpoint URLs.
 ///
@@ -989,7 +989,7 @@ mod tests {
     #[test]
     fn normalize_api_base_url_removes_whitespace_and_trailing_slashes() {
         assert_eq!(
-            normalize_api_base_url("  http://117.147.213.234:38080///  "),
+            normalize_api_base_url("  http://117.147.213.234:9080///  "),
             DEFAULT_API_BASE_URL
         );
     }

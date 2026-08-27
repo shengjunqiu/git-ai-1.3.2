@@ -399,7 +399,7 @@ curl -v https://git-ai.example.com/health
 Windows PowerShell：
 
 ```powershell
-Test-NetConnection 203.0.113.10 -Port 38080
+Test-NetConnection 203.0.113.10 -Port 9080
 ```
 
 如果连接失败，请确认当前网络允许访问 `git-ai.example.com`，必要时联系管理员。
