@@ -62,7 +62,7 @@ jobs:
       - name: Build git-ai
         run: cargo build --release --features keyring --bin git-ai
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
 
@@ -213,7 +213,7 @@ jobs:
       - name: Build git-ai
         run: cargo build --release --features keyring --bin git-ai
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
 
