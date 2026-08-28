@@ -102,8 +102,8 @@ jobs:
           done > "$PACKAGE_DIR/IMAGE-METADATA.txt"
 
           (
-            cd "$PACKAGE_DIR"
-            sha256sum images/git-ai-enterprise-stack.tar > images/SHA256SUMS
+            cd "$PACKAGE_DIR/images"
+            sha256sum git-ai-enterprise-stack.tar > SHA256SUMS
           )
 
           tar -C "$PACKAGE_DIR" -czf "${GITHUB_WORKSPACE}/${PACKAGE_NAME}.tar.gz" .

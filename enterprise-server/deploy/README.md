@@ -160,7 +160,7 @@ docker compose up -d --pull never api
 | 004 | 数据隔离 |
 | 005 | Linewell 组织及测试数据 |
 
-PostgreSQL 容器首次启动时会读取 `migrations/` 目录；API 启动时也会按迁移记录自动执行镜像内嵌迁移。`migrate.sh` 仅用于诊断或显式手工迁移，不是正常部署步骤。
+`migrations/` 目录用于查看随部署包发布的 SQL；它不会挂载到 PostgreSQL 的自动初始化目录。API 启动时会按迁移记录自动执行镜像内嵌迁移。`migrate.sh` 仅用于显式触发同一套内嵌迁移，不是正常部署步骤。
 
 ## API Key 管理
 
