@@ -333,16 +333,22 @@ jobs:
         run: |
           VERSION="${{ steps.release-meta.outputs.tag_name }}"
           REPO="${{ github.repository }}"
+          API_BASE_URL=$(sed -n 's/^pub const DEFAULT_API_BASE_URL: &str = "\([^"]*\)";/\1/p' repo/src/config.rs)
+          if [ -z "$API_BASE_URL" ]; then
+            echo "Could not read DEFAULT_API_BASE_URL from src/config.rs" >&2
+            exit 1
+          fi
           # Convert checksums to pipe-separated format for embedding
           CHECKSUMS=$(tr '\n' '|' < release/SHA256SUMS | sed 's/|$//')
           if [ -z "$CHECKSUMS" ]; then
             CHECKSUMS="__CHECKSUMS_PLACEHOLDER__"
           fi
           # Replace placeholder values with release-specific values (pattern-based to be resilient to line changes)
-          awk -v repo="$REPO" -v version="$VERSION" -v checksums="$CHECKSUMS" '
+          awk -v repo="$REPO" -v version="$VERSION" -v checksums="$CHECKSUMS" -v api_base_url="$API_BASE_URL" '
             /^REPO="__REPO_PLACEHOLDER__"/ { sub(/__REPO_PLACEHOLDER__/, repo) }
             /^PINNED_VERSION="__VERSION_PLACEHOLDER__"/ { sub(/__VERSION_PLACEHOLDER__/, version) }
             /^EMBEDDED_CHECKSUMS="__CHECKSUMS_PLACEHOLDER__"/ { sub(/__CHECKSUMS_PLACEHOLDER__/, checksums) }
+            /^ENTERPRISE_API_BASE_URL="__ENTERPRISE_API_BASE_URL_PLACEHOLDER__"/ { sub(/__ENTERPRISE_API_BASE_URL_PLACEHOLDER__/, api_base_url) }
             { print }
           ' repo/install.sh > release/install.sh
           chmod +x release/install.sh
@@ -353,16 +359,22 @@ jobs:
         run: |
           VERSION="${{ steps.release-meta.outputs.tag_name }}"
           REPO="${{ github.repository }}"
+          API_BASE_URL=$(sed -n 's/^pub const DEFAULT_API_BASE_URL: &str = "\([^"]*\)";/\1/p' repo/src/config.rs)
+          if [ -z "$API_BASE_URL" ]; then
+            echo "Could not read DEFAULT_API_BASE_URL from src/config.rs" >&2
+            exit 1
+          fi
           # Reuse checksums from earlier step
           CHECKSUMS=$(tr '\n' '|' < release/SHA256SUMS | sed 's/|$//')
           if [ -z "$CHECKSUMS" ]; then
             CHECKSUMS="__CHECKSUMS_PLACEHOLDER__"
           fi
           # Replace placeholder values with release-specific values (pattern-based to be resilient to line changes)
-          awk -v repo="$REPO" -v version="$VERSION" -v checksums="$CHECKSUMS" '
+          awk -v repo="$REPO" -v version="$VERSION" -v checksums="$CHECKSUMS" -v api_base_url="$API_BASE_URL" '
             /^[$]Repo = .__REPO_PLACEHOLDER__/ { sub(/__REPO_PLACEHOLDER__/, repo) }
             /^[$]PinnedVersion = .__VERSION_PLACEHOLDER__/ { sub(/__VERSION_PLACEHOLDER__/, version) }
             /^[$]EmbeddedChecksums = .__CHECKSUMS_PLACEHOLDER__/ { sub(/__CHECKSUMS_PLACEHOLDER__/, checksums) }
+            /^[$]EnterpriseApiBaseUrl = .__ENTERPRISE_API_BASE_URL_PLACEHOLDER__/ { sub(/__ENTERPRISE_API_BASE_URL_PLACEHOLDER__/, api_base_url) }
             { print }
           ' repo/install.ps1 > release/install.ps1
           echo "Generated version-pinned install.ps1 for $VERSION from $REPO"

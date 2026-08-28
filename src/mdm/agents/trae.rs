@@ -3,10 +3,13 @@ use crate::mdm::command_line::{HookShell, platform_hook_shell, render_hook_comma
 use crate::mdm::hook_installer::{
     HookCheckResult, HookInstaller, HookInstallerParams, InstallResult,
 };
+#[cfg(not(target_os = "macos"))]
+use crate::mdm::utils::binary_exists;
+#[cfg(target_os = "windows")]
+use crate::mdm::utils::windows_uninstall_display_name_exists;
 use crate::mdm::utils::{
-    binary_exists, generate_diff, home_dir, install_vsc_editor_extension,
-    is_git_ai_checkpoint_command, is_vsc_editor_extension_installed, resolve_editor_cli,
-    windows_uninstall_display_name_exists, write_atomic,
+    generate_diff, home_dir, install_vsc_editor_extension, is_git_ai_checkpoint_command,
+    is_vsc_editor_extension_installed, resolve_editor_cli, write_atomic,
 };
 use serde_json::{Value, json};
 use std::fs;

@@ -274,7 +274,7 @@ fn test_config_fresh_respects_env_vars() {
 
     // Without env var, should use default
     let config1 = Config::fresh();
-    assert_eq!(config1.api_base_url(), "http://117.147.213.234:38080");
+    assert_eq!(config1.api_base_url(), "http://106.14.183.34:38080");
 
     // With env var set, should use env var
     unsafe {
@@ -288,7 +288,7 @@ fn test_config_fresh_respects_env_vars() {
         env::remove_var("GIT_AI_API_BASE_URL");
     }
     let config3 = Config::fresh();
-    assert_eq!(config3.api_base_url(), "http://117.147.213.234:38080");
+    assert_eq!(config3.api_base_url(), "http://106.14.183.34:38080");
 
     // Restore original GIT_AI_API_BASE_URL (home guard restores home vars via Drop)
     unsafe {

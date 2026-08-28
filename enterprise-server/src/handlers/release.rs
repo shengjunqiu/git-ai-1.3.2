@@ -763,6 +763,10 @@ fn render_installer_template(
             &format!("ENTERPRISE_RELEASE_CHANNEL=\"{}\"", version),
         )
         .replace(
+            "ENTERPRISE_API_BASE_URL=\"__ENTERPRISE_API_BASE_URL_PLACEHOLDER__\"",
+            &format!("ENTERPRISE_API_BASE_URL=\"{}\"", release_base_url),
+        )
+        .replace(
             "$PinnedVersion = '__VERSION_PLACEHOLDER__'",
             &format!("$PinnedVersion = '{}'", version),
         )
@@ -777,6 +781,10 @@ fn render_installer_template(
         .replace(
             "$EnterpriseReleaseChannel = '__ENTERPRISE_RELEASE_CHANNEL_PLACEHOLDER__'",
             &format!("$EnterpriseReleaseChannel = '{}'", version),
+        )
+        .replace(
+            "$EnterpriseApiBaseUrl = '__ENTERPRISE_API_BASE_URL_PLACEHOLDER__'",
+            &format!("$EnterpriseApiBaseUrl = '{}'", release_base_url),
         )
 }
 
@@ -1199,6 +1207,9 @@ $EnterpriseReleaseChannel = '1.3.4'"#;
             generated_shell.contains("ENTERPRISE_RELEASE_BASE_URL=\"http://example.test:38080\"")
         );
         assert!(generated_shell.contains("ENTERPRISE_RELEASE_CHANNEL=\"1.3.4\""));
+        assert!(
+            generated_shell.contains("ENTERPRISE_API_BASE_URL=\"http://example.test:38080\"")
+        );
 
         let generated_powershell = render_installer_template(
             INSTALL_PS1_TEMPLATE,
@@ -1210,6 +1221,8 @@ $EnterpriseReleaseChannel = '1.3.4'"#;
         assert!(generated_powershell
             .contains("$EnterpriseReleaseBaseUrl = 'http://example.test:38080'"));
         assert!(generated_powershell.contains("$EnterpriseReleaseChannel = '1.3.4'"));
+        assert!(generated_powershell
+            .contains("$EnterpriseApiBaseUrl = 'http://example.test:38080'"));
     }
 
     #[test]

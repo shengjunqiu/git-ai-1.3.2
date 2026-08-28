@@ -69,9 +69,13 @@ EMBEDDED_CHECKSUMS="__CHECKSUMS_PLACEHOLDER__"
 ENTERPRISE_RELEASE_BASE_URL="__ENTERPRISE_RELEASE_BASE_URL_PLACEHOLDER__"
 ENTERPRISE_RELEASE_CHANNEL="__ENTERPRISE_RELEASE_CHANNEL_PLACEHOLDER__"
 
-# Enterprise API endpoint. Every install and upgrade enforces this value,
-# replacing any api_base_url previously saved by the user.
-ENTERPRISE_API_BASE_URL="http://117.147.213.234:38080"
+# Enterprise API endpoint. Enterprise release generation replaces this with
+# the server's current BASE_URL. Raw/public installers fall back to the CLI's
+# compiled default endpoint.
+ENTERPRISE_API_BASE_URL="__ENTERPRISE_API_BASE_URL_PLACEHOLDER__"
+if [ "$ENTERPRISE_API_BASE_URL" = "__ENTERPRISE_API_BASE_URL_PLACEHOLDER__" ]; then
+    ENTERPRISE_API_BASE_URL="http://106.14.183.34:38080"
+fi
 
 # Function to print error messages
 error() {

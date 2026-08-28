@@ -3316,7 +3316,7 @@ mod tests {
         assert!(html.contains(r#"<body class="dashboard-role-admin">"#));
         assert!(!html.contains("const isAdmin"));
         assert!(html.contains("&lt;Admin &quot;A&quot; &amp; &#39;B&#39;&gt;"));
-        assert!(!html.contains("117.147.213.234"));
+        assert!(!html.contains("106.14.183.34"));
         assert!(!html.contains("cdn.jsdelivr.net"));
         assert!(!html.contains("__GITAI_"));
         assert!(!help.contains("__GITAI_"));

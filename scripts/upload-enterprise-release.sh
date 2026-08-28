@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SERVER="${GIT_AI_RELEASE_SERVER:-http://117.147.213.234:38080}"
+SERVER="${GIT_AI_RELEASE_SERVER:-http://106.14.183.34:38080}"
 SERVER="${SERVER%/}"
 VERSION="${GIT_AI_RELEASE_VERSION:-$(awk -F '"' '/^version = / { print $2; exit }' "$ROOT_DIR/Cargo.toml")}"
 CHANNEL="${GIT_AI_RELEASE_CHANNEL:-latest}"

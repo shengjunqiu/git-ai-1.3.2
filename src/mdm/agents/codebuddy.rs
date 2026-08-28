@@ -1,9 +1,10 @@
 use crate::error::GitAiError;
 use crate::mdm::command_line::{HookShell, platform_hook_shell, render_hook_command};
 use crate::mdm::hook_installer::{HookCheckResult, HookInstaller, HookInstallerParams};
+#[cfg(target_os = "windows")]
+use crate::mdm::utils::windows_uninstall_display_name_exists;
 use crate::mdm::utils::{
-    binary_exists, generate_diff, home_dir, is_git_ai_checkpoint_command,
-    windows_uninstall_display_name_exists, write_atomic,
+    binary_exists, generate_diff, home_dir, is_git_ai_checkpoint_command, write_atomic,
 };
 use serde_json::{Value, json};
 use std::fs;
@@ -43,7 +44,7 @@ impl CodeBuddyInstaller {
 
         #[cfg(target_os = "macos")]
         {
-            return [
+            [
                 PathBuf::from("/Applications/CodeBuddy.app"),
                 PathBuf::from("/Applications/CodeBuddy CN.app"),
                 home.join("Applications").join("CodeBuddy.app"),
@@ -51,7 +52,7 @@ impl CodeBuddyInstaller {
             ]
             .iter()
             .any(|path| path.exists())
-                || binary_exists("codebuddy");
+                || binary_exists("codebuddy")
         }
 
         #[cfg(target_os = "windows")]

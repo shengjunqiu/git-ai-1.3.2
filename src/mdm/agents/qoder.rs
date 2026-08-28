@@ -1,10 +1,11 @@
 use crate::error::GitAiError;
 use crate::mdm::command_line::{HookShell, platform_hook_shell, render_hook_command};
 use crate::mdm::hook_installer::{HookCheckResult, HookInstaller, HookInstallerParams};
-use crate::mdm::utils::{
-    binary_exists, generate_diff, home_dir, is_git_ai_checkpoint_command,
-    windows_uninstall_display_name_exists, write_atomic,
-};
+#[cfg(not(target_os = "macos"))]
+use crate::mdm::utils::binary_exists;
+#[cfg(target_os = "windows")]
+use crate::mdm::utils::windows_uninstall_display_name_exists;
+use crate::mdm::utils::{generate_diff, home_dir, is_git_ai_checkpoint_command, write_atomic};
 use serde_json::{Value, json};
 use std::fs;
 use std::path::{Path, PathBuf};

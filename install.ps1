@@ -234,9 +234,13 @@ $EmbeddedChecksums = '__CHECKSUMS_PLACEHOLDER__'
 $EnterpriseReleaseBaseUrl = '__ENTERPRISE_RELEASE_BASE_URL_PLACEHOLDER__'
 $EnterpriseReleaseChannel = '__ENTERPRISE_RELEASE_CHANNEL_PLACEHOLDER__'
 
-# Enterprise API endpoint. Every install and upgrade enforces this value,
-# replacing any api_base_url previously saved by the user.
-$EnterpriseApiBaseUrl = 'http://117.147.213.234:38080'
+# Enterprise API endpoint. Enterprise release generation replaces this with
+# the server's current BASE_URL. Raw/public installers fall back to the CLI's
+# compiled default endpoint.
+$EnterpriseApiBaseUrl = '__ENTERPRISE_API_BASE_URL_PLACEHOLDER__'
+if ($EnterpriseApiBaseUrl -eq '__ENTERPRISE_API_BASE_URL_PLACEHOLDER__') {
+    $EnterpriseApiBaseUrl = 'http://106.14.183.34:38080'
+}
 
 # Ensure TLS 1.2 for GitHub downloads on older PowerShell versions
 try {
