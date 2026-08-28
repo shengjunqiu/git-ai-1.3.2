@@ -93,7 +93,7 @@ jobs:
 
       - name: Install Rust toolchain (non-Docker)
         if: matrix.use_docker == false
-        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # master
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master
         with:
           toolchain: stable
           targets: ${{ matrix.target }}
@@ -217,7 +217,7 @@ jobs:
           echo "version=v$VERSION" >> $GITHUB_OUTPUT
 
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # master
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master
         with:
           toolchain: stable
           targets: x86_64-apple-darwin
@@ -462,7 +462,7 @@ jobs:
 
       - name: Install Rust toolchain
         if: inputs.release_production == true
-        uses: dtolnay/rust-toolchain@efa25f7f19611383d5b0ccf2d1c8914531636bf9 # master
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master
         with:
           toolchain: stable
 
