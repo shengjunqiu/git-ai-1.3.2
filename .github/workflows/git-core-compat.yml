@@ -44,7 +44,7 @@ jobs:
           override: true
 
       - name: Cache dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -59,7 +59,7 @@ jobs:
         run: echo "week=$(date +'%Y-%U')" >> $GITHUB_OUTPUT
 
       - name: Cache git source
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: /tmp/git-core-tests
           key: git-source-${{ runner.os }}-${{ steps.date.outputs.week }}
